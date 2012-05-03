@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+{% if error %}
+<p style="color:red;"> Invalid username / password </p>
+{% endif %}
+  <form action="" method="post">
+            Username:
+            <p><input type=text name=username>
+            <p>password</p>
+            <p><input type=password name=password>
+            <p><input type=submit value=Login>
+        </form>
+{% endblock %}
