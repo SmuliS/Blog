@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+{% if error%}
+<p style="color:red;"> {{error}} </p>
+{% endif%}
+	<form action="" method="post"><pre>
+			Write here your new blog post<br>
+		Title:	<input type="text" name="title" value="{{post.title}}"/><br>
+		Text:	<textarea name="text" rows="10" cols="50">{{post.text}} </textarea>
+		Tags:	<input type="text" name="tags" value="{{post.tags}}"/> <- seperate with commas
+				<input type=submit value="Save!">
+		</pre>
+	</form>
+{% endblock %}
