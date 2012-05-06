@@ -4,13 +4,64 @@ from flask import request
 from flask import session
 from flask import redirect
 from flask import url_for
+from database import db_session
+from flask.ext.sqlalchemy import SQLAlchemy
+from models import Post
+import database
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_ECHO'] = True
+db = SQLAlchemy(app)
 
 
 @app.route('/')
 def index():
-    return render_template('posts.html')
+    results = []
+    tags = []
+    temp = []
+    counter = 0
+    results = Post.query.all()
+    for post in results:
+        temp = parse_tags(post.tags)
+        tags.append(temp)
+    return render_template('posts.html', result = results, tags = tags)
 
+
+@app.route('/post/<int:post_id>')
+def show_post(post_id):
+    post = Post.query.get(post_id)
+    return render_template('post.html', post = post)
+
+
+@app.route('/delete/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    post = Post.query.get(post_id)
+    db_session.delete(post)
+    db_session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    if(request.method == 'GET'):
+        post = Post.query.get(post_id)
+        return render_template('edit.html', post = post)
+    else:
+        new_title = request.form['title']
+        new_text = request.form['text']
+        new_tags = request.form['tags']
+        post = Post.query.get(post_id)
+        post.title = new_title
+        post.text = new_text
+        post.tags = new_tags
+        db_session.commit()
+        return redirect(url_for('index'))
+
+
+@app.route('/tag/<tag_name>')
+def search_by_tag(tag_name):
+    return redirect(url_for('index'))
 
 @app.route('/contact')
 def contact():
@@ -25,15 +76,46 @@ def login():
             session['username'] = request.form['username']
             return redirect(url_for('index'))
         else:
-            error_message = 1
+            error_message = "Invalid username / password !"
 
     return render_template('login.html', error=error_message)
+
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
+
+@app.route('/add_new_post', methods=['GET', 'POST'])
+def add_new_post():
+    try:
+        session['username']
+    except KeyError:
+        error_message = "Log in before posting"
+        return render_template('login.html', error=error_message)
+    if request.method == 'GET':
+            return render_template('add_new_post.html')
+    if request.method == 'POST':
+        title = request.form['title']
+        text = request.form['text']
+        tags = request.form['tags']
+        post = Post(title, text, tags)
+        db_session.add(post)
+        db_session.commit()
+        return redirect(url_for('index'))
+
+
+@app.teardown_request
+def shutdown_session(exception=None):
+    db_session.remove()
+
+
+def parse_tags(tags):
+    print ("PARSII PERKEE")
+    parsed_tags = tags.split(",");
+    print parsed_tags[0]
+    return parsed_tags
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 

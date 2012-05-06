@@ -39,25 +39,35 @@
 
               {% if session['username'] == 'testi'%}
               <li><a href="/logout">Logout</a></li>
-              <li><a href="/">Logged in as, {{session['username']}}</a></li>
               {% else %}
               <li><a href="/login">Login</a></li>
               {% endif%}
 
             </ul>
-          </div><!--/.nav-collapse -->
+          </div>
+          {% if session['username'] == 'testi'%}
+          <ul class="nav pull-right">
+              <li class="active">
+                <a href="#">Logged in as, {{session['username']}} </a>
+              </li>
+          </ul>
+          {% endif%}
         </div>
       </div>
     </div>
     <div class="hero-unit">
       <h1>Blog it!</h1>
       <p>This is a blog about blaaBlaa</p>
+      {% if session['username']%}
+      <a class="btn btn-primary btn-large" href="/add_new_post">
+          Add new post
+      </a>
+      {% endif%}
     </div>
 
     <div class="container">
     {% block content %}
 
-      <p>Tanne tulee postaukset.</p>
     {% endblock %}
     </div> <!-- /container -->
 
