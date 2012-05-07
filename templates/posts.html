@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <ul>
-	{% for post in result | reverse %}
+	{% for post in result %}
 	<div style="padding:20px;background-color:#C0C0C0;margin:20px;margin-left:-20px;border-radius:15px;">
 	<a href="/post/{{post.id}}" style="color:black;">
 		<div>
@@ -27,4 +27,17 @@
 </div>
 	{% endfor %}
 </ul>
+<div style="width:100%">
+<p>
+	{% if pagination %}
+{% if pagination.has_next%}
+<a href="/{{pagination.page+1}}" style="margin-left:50%">>>>>>></a>
+{% endif%}
+{% if pagination.has_prev%}
+<a href="/{{pagination.page-1}}" style="margin-left:50%"><<<<<<<</a>
+{% endif%}
+{% endif%}
+</p>
+</div>
+
 {% endblock %}

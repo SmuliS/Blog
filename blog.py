@@ -6,7 +6,8 @@ from flask import redirect
 from flask import url_for
 from database import db_session
 from flask.ext.sqlalchemy import SQLAlchemy
-from models import Post
+from models.models import Post
+from models.models import Pagination
 import database
 
 app = Flask(__name__)
@@ -14,9 +15,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
+PER_PAGE = 5
 
-@app.route('/')
-def index():
+
+@app.route('/', defaults={'page': 1})
+@app.route('/<int:page>')
+def index(page):
     results = []
     tags = []
     temp = []
@@ -26,7 +30,11 @@ def index():
         if(len(post.text) > 150):
             post.text = post.text[:150] + "..."
         post.tags = post.tags.split(",")
-    return render_template('posts.html', result = results)
+    count = len(results)
+    posts_for_page = get_posts_for_page(page, PER_PAGE, count, results)
+    pagination = Pagination(page, PER_PAGE, count)
+    return render_template('posts.html', result = posts_for_page,
+     pagination = pagination)
 
 
 @app.route('/post/<int:post_id>')
@@ -83,7 +91,8 @@ def contact():
 def login():
     error_message = None
     if (request.method == 'POST'):
-        if (request.form['password'] == 'kayttaja') and (request.form['username'] == 'testi'):
+        if (request.form['password'] == 'kayttaja') and \
+        (request.form['username'] == 'testi'):
             session['username'] = request.form['username']
             return redirect(url_for('index'))
         else:
@@ -123,8 +132,22 @@ def shutdown_session(exception=None):
 
 
 def parse_tags(tags):
-    parsed_tags = tags.split(",");
+    parsed_tags = tags.split(",")
     return parsed_tags
+
+def get_posts_for_page(page, PER_PAGE, count, posts):
+    page = page - 1
+    posts = Post.query.all()
+    print posts
+    posts_per_one_page = []
+    for i in range(page * PER_PAGE, page * PER_PAGE + PER_PAGE):
+        print len(posts) - i - 1
+        posts_per_one_page.append(posts[len(posts) - i - 1])
+        if (len(posts_per_one_page) == len(posts)):
+            break
+        if(len(posts) - i - 1 == 0):
+            break
+    return posts_per_one_page
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
