@@ -1,0 +1,13 @@
+Login information to blog:
+Username : testi
+Password: kayttaja
+
+How to run:
+-run command "python blog.py"
+- go "localhost:5000" in your web-browser
+
+how to set up local database http://flask.pocoo.org/docs/patterns/sqlalchemy/
+Commands:
+  "from database import init_db"
+  "init_db()"
+
