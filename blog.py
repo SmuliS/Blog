@@ -26,6 +26,7 @@ def index(page):
     temp = []
     counter = 0
     results = Post.query.all()
+    print results
     for post in results:
         if(len(post.text) > 150):
             post.text = post.text[:150] + "..."
@@ -135,19 +136,23 @@ def parse_tags(tags):
     parsed_tags = tags.split(",")
     return parsed_tags
 
+
 def get_posts_for_page(page, PER_PAGE, count, posts):
     page = page - 1
     posts = Post.query.all()
-    print posts
     posts_per_one_page = []
     for i in range(page * PER_PAGE, page * PER_PAGE + PER_PAGE):
-        print len(posts) - i - 1
-        posts_per_one_page.append(posts[len(posts) - i - 1])
+        if(len(posts) - i == 0):
+            break
         if (len(posts_per_one_page) == len(posts)):
             break
-        if(len(posts) - i - 1 == 0):
-            break
-    return posts_per_one_page
+        posts_per_one_page.append(posts[len(posts) - i - 1])
+
+    if len(posts_per_one_page) == 0:
+        return posts
+    else:
+        print posts_per_one_page
+        return posts_per_one_page
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 

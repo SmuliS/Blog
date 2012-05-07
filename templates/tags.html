@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<ul>
+    {% for post in result | reverse %}
+    <div style="padding:20px;background-color:#C0C0C0;margin:20px;margin-left:-20px;border-radius:15px;">
+    <a href="/post/{{post.id}}" style="color:black;">
+        <div>
+        <h2>Title: {{post.title}}</h2>
+        Text: {{post.text}}<br>
+
+    </div>
+    </a>
+            Tags:
+        <a href="/tag/{{post.tags}}">{{post.tags}}</a>
+    {% if session['username']%}
+    <div float="right">
+        <form action="/edit/{{post.id}}" method="get">
+              <input type="submit" value="Edit post" />
+        </form>
+        <form action="/delete/{{post.id}}" method="post">
+              <input type="submit" value="Delete post" />
+        </form>
+    </div>
+    {% endif%}
+</div>
+    {% endfor %}
+</ul>
+{% endblock %}
