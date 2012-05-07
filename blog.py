@@ -23,9 +23,10 @@ def index():
     counter = 0
     results = Post.query.all()
     for post in results:
-        temp = parse_tags(post.tags)
-        tags.append(temp)
-    return render_template('posts.html', result = results, tags = tags)
+        if(len(post.text) > 150):
+            post.text = post.text[:150] + "..."
+        post.tags = post.tags.split(",")
+    return render_template('posts.html', result = results)
 
 
 @app.route('/post/<int:post_id>')
@@ -61,7 +62,17 @@ def edit_post(post_id):
 
 @app.route('/tag/<tag_name>')
 def search_by_tag(tag_name):
-    return redirect(url_for('index'))
+    hits = []
+    posts = Post.query.all()
+    for post in posts:
+        try:
+            if post.tags.count(tag_name) != 0:
+                post.tags = post.tags.split(",")
+                hits.append(post)
+        except ValueError:
+            print ("Voi Voi")
+    return render_template('posts.html', result = hits)
+
 
 @app.route('/contact')
 def contact():
@@ -112,9 +123,7 @@ def shutdown_session(exception=None):
 
 
 def parse_tags(tags):
-    print ("PARSII PERKEE")
     parsed_tags = tags.split(",");
-    print parsed_tags[0]
     return parsed_tags
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
