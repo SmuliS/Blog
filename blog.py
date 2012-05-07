@@ -82,9 +82,9 @@ def search_by_tag(tag_name):
     return render_template('posts.html', result = hits)
 
 
-@app.route('/contact')
+@app.route('/about')
 def contact():
-    return render_template('contact.html')
+    return render_template('about.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
